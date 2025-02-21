@@ -6,9 +6,9 @@ const Home = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="Shinobi" />
+        <img src={logo} style={{ width: "64rem", height: "32rem" }} className="App-logo" alt="Shinobi" /> 
         <h1>Welcome to the Shinobi World</h1>
-        <p>Trenuj jak prawdziwy ninja i odkryj jego tajemnice.</p>
+        <p>Odkrywaj jedyną w swoim rodzaju grę RPG w świecie shinobi</p>
       </header>
     </div>
   );
