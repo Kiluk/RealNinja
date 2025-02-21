@@ -1,13 +1,13 @@
 import React from "react";
+import LogInButton from "./LogInButton";
 
 const Login = () => {
   return (
-    <div >
-        <p className="text-gray-600 mt-2">Odkryj tajniki ninja i stań się prawdziwym wojownikiem.</p>
-        <button>
-          Zaloguj się
-        </button>
-      </div>
+    <div className="login-page">
+      <h1>Logowanie</h1>
+      <p>Odkryj tajniki ninja i stań się prawdziwym wojownikiem.</p>
+      <LogInButton />
+    </div>
   );
 };
 

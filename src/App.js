@@ -1,16 +1,20 @@
-import logo from './shinobi.jpg';
-import './App.css';
-import NavBar from './NavBar';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import NavBar from "./NavBar";
+import Home from "./Home";
+import Login from "./Login";
 
 function App() {
   return (
+    <Router>
       <div className="App">
-        <header className="App-header" text="Real Ninja">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>Welcome to the Shinobi World</p>
-          <NavBar />
-        </header>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
       </div>
+    </Router>
   );
 }
 
