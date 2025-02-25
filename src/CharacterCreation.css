@@ -1,0 +1,107 @@
+/* Główne tło strony */
+.character-creation {
+    text-align: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #1a1a2e;
+    color: white;
+  }
+  
+  /* Kontener dla obrazka postaci */
+  .character-image-container {
+    margin: 20px auto;
+  }
+  
+  .character-image {
+    width: 200px;
+    height: auto;
+    border-radius: 10px;
+    border: 3px solid #f9ca24;
+  }
+  
+  /* Grupowanie pól tekstowych */
+  .input-group {
+    margin: 15px 0;
+  }
+  
+  input, select {
+    padding: 8px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  input {
+    width: 200px;
+  }
+  
+  select {
+    width: 220px;
+  }
+  
+  /* Statystyki */
+  .stats-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .stat button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .stat button:hover {
+    background-color: #c0392b;
+  }
+  
+  .stat-value {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  /* Podsumowanie */
+  .summary {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+  
+  /* Ensure the entire CharacterCreation page takes up full screen */
+.character-creation {
+    height: 100vh;
+    width: 100vw;
+    background-image: url("./BlankCharacter.jpg"); /* Ensure the correct path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  /* Ensure text is readable */
+  .character-creation h1, .character-creation p {
+    color: white;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+  }
+  
