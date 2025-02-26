@@ -88,8 +88,8 @@
 .character-creation {
     height: 100vh;
     width: 100vw;
-    background-image: url("./BlankCharacter.jpg"); /* Ensure the correct path */
-    background-size: cover;
+    background-image: url("./BlankCharacter.png"); /* Ensure the correct path */
+    background-size: 50%;
     background-position: center;
     background-repeat: no-repeat;
     display: flex;
