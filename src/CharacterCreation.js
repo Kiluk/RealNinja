@@ -6,9 +6,15 @@ const CharacterCreation = () => {
   const [clan, setClan] = useState("");
 
   const [stats, setStats] = useState({
+    hp: 20,
+    chakra: 10,
     strength: 5,
     agility: 5,
     intelligence: 5,
+    chakraContorl: 4,
+    ninJutsu: 1,
+    genJutsu: 1,
+    taiJutsu: 1,
   });
 
   const handleStatChange = (stat, amount) => {
@@ -59,7 +65,9 @@ const CharacterCreation = () => {
         <h2>Podsumowanie</h2>
         <p><strong>Nazwa:</strong> {characterName || "Brak"}</p>
         <p><strong>Klan:</strong> {clan || "Nie wybrano"}</p>
-        <p><strong>Statystyki:</strong> Siła {stats.strength}, Zręczność {stats.agility}, Inteligencja {stats.intelligence}</p>
+        <p><strong>Statystyki:</strong> HP {stats.hp}, Chakra {stats.chakra}</p>
+          <p> Siła {stats.strength}, Zręczność {stats.agility}, Inteligencja {stats.intelligence}, Kontrola Chakry {stats.chakraContorl}</p>
+        <p>Genjutsu {stats.genJutsu}. Taijutsu {stats.taiJutsu}, Ninjutsu {stats.ninJutsu}</p>
       </div>
     </div>
   );
