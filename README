@@ -1,0 +1,69 @@
+# RealNinja
+
+## Opis projektu
+RealNinja to aplikacja webowa będąca grą fabularną RPG, inspirowaną światem shinobi z anime Naruto. Celem projektu jest stworzenie interaktywnej rozgrywki, w której gracze mogą tworzyć własne postacie, rozwijać ich umiejętności oraz uczestniczyć w różnorodnych misjach i starciach.
+
+## Technologie
+Projekt wykorzystuje następujące technologie:
+- **Frontend:** React.js
+- **Backend:** Node.js
+- **Baza danych:** Microsoft SQL Server (MSSQL)
+
+## Status projektu
+Projekt znajduje się na wczesnym etapie rozwoju. Aktualnie trwają prace nad:
+- Podstawową strukturą aplikacji,
+- Tworzeniem mechaniki gry i systemu postaci,
+- Integracją frontendowej i backendowej części projektu.
+
+## Uruchomienie projektu
+Aby uruchomić aplikację lokalnie, wykonaj następujące kroki:
+
+### Backend
+1. Upewnij się, że masz zainstalowanego Node.js oraz MSSQL.
+2. Przejdź do katalogu `backend`:
+   ```sh
+   cd backend
+   ```
+3. Zainstaluj zależności:
+   ```sh
+   npm install
+   ```
+4. Skonfiguruj połączenie z bazą danych w pliku `.env`.
+5. Uruchom serwer backendu:
+   ```sh
+   npm start
+   ```
+
+### Frontend
+1. Przejdź do katalogu `frontend`:
+   ```sh
+   cd frontend
+   ```
+2. Zainstaluj zależności:
+   ```sh
+   npm install
+   ```
+3. Uruchom aplikację frontendową:
+   ```sh
+   npm start
+   ```
+
+## Funkcjonalności (planowane)
+- Tworzenie i personalizacja postaci shinobi,
+- System umiejętności i statystyk postaci,
+- Interaktywne misje i walki PvE/PvP,
+- System drużyn i klanów,
+- Wbudowany czat i mechaniki społecznościowe.
+
+## Wkład w projekt
+Jeśli chcesz pomóc w rozwoju projektu, możesz:
+- Forkować repozytorium i zgłaszać pull requesty,
+- Zgłaszać błędy i sugestie w sekcji "Issues" na GitHubie,
+- Kontaktować się bezpośrednio w celu współpracy.
+
+## Licencja
+Projekt jest rozwijany jako open-source. Szczegóły licencji zostaną dodane w przyszłości.
+
+---
+Jeśli masz pytania lub propozycje, skontaktuj się ze mną poprzez GitHub!
+
