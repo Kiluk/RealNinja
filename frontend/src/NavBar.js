@@ -37,7 +37,7 @@ function NavBar({ isLoggedIn, setIsLoggedIn }) {
         )}
       </div>
 
-      {showLogin && <LogInButton onClose={() => setShowLogin(false)} />}
+      {showLogin && <LogInButton onClose={() => setShowLogin(false)} setIsLoggedIn={setIsLoggedIn} />}
       {showRegister && <RegisterPopup onClose={() => setShowRegister(false)} />}
     </nav>
   );

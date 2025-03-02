@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css"; // Stylizacja popupu
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function LogInButton({ onClose, setIsLoggedIn }) {
   const [username, setUsername] = useState("");
@@ -11,12 +12,16 @@ function LogInButton({ onClose, setIsLoggedIn }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:5000/login", {emial , password});
+      const response = await axios.post("http://localhost:5000/login", {
+        username,
+        password,
+      });
       localStorage.setItem("token", response.data.token);
       setIsLoggedIn(true);
       onClose();
       navigate("/");
     } catch (error) {
+      console.log(error);
       alert("Nieprawidłowe dane logowania");
     }
   };
@@ -39,7 +44,7 @@ function LogInButton({ onClose, setIsLoggedIn }) {
           onChange={(e) => setPassword(e.target.value)}
           className="input-field"
         />
-        <button className="submit-btn">Zaloguj</button>
+        <button onClick={handleLogin}>Zaloguj</button>
         <button onClick={onClose}> Zamknij</button>
       </div>
     </div>

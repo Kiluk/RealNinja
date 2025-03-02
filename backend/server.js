@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 const dbConfig = {
   user: "sa",
   password: "UiS6zeG9WhdZI15",
-  server: "localhost\\OPTIMA", 
+  server: "localhost\\OPTIMA",
   database: "ninja_db",
   port: 1433,
   options: {
@@ -33,7 +33,7 @@ const connectDB = async () => {
 
 connectDB();
 
-// **API do rejestracji**
+// API do rejestracji
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -59,31 +59,41 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// **API do logowania**
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+// API do logowania
 
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email i hasło są wymagane!" });
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  console.log("Otrzymano żądanie logowania:", username);
+
+  if (!username || !password) {
+    return res.status(400).json({ message: "Nazwa użytkownika i hasło są wymagane!" });
   }
 
   try {
-    const result = await sql.query(
-      `SELECT * FROM users WHERE email = @email`,
-      { email }
-    );
+    console.log("Wysyłanie zapytania do bazy...");
+    
+    const request = new sql.Request();
+    request.input("username", sql.VarChar, username);
+
+    const result = await request.query(`
+      SELECT * FROM users WHERE username = @username
+    `);
+
+    console.log("Wynik zapytania SQL:", result.recordset);
 
     if (!result.recordset[0]) {
       return res.status(401).json({ message: "❌ Nieprawidłowe dane logowania" });
     }
 
     const user = result.recordset[0];
+    console.log("Sprawdzanie hasła dla użytkownika:", user.username);
+
     const validPassword = await bcrypt.compare(password, user.password);
+    
     if (!validPassword) {
       return res.status(401).json({ message: "❌ Nieprawidłowe dane logowania" });
     }
-
-    const token = jwt.sign({ id: user.id }, "secretkey", { expiresIn: "1h" });
+    const token = jwt.sign({ id: user.id, username: user.username }, "secretkey", { expiresIn: "1h" });
 
     res.status(200).json({ message: "✅ Zalogowano!", token, user: { id: user.id, username: user.username } });
   } catch (error) {
