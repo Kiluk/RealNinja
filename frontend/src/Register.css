@@ -1,0 +1,42 @@
+.register-container {
+    width: 300px;
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background: #1a1a1a;
+    color: white;
+  }
+  
+  .input-group {
+    margin-bottom: 15px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: none;
+  }
+  
+  .register-btn {
+    background: #ff4500;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .register-btn:hover {
+    background: #ff6347;
+  }
+  
+  .message {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  
