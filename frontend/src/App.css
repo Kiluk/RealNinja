@@ -20,7 +20,7 @@
 
 .navbar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   gap: 20px;
   background-color: #34495e;
   padding: 10px;

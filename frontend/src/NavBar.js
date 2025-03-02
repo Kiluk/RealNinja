@@ -1,14 +1,44 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import LogInButton from "./LogInButton";
+import RegisterPopup from "./Register";
 
-function NavBar() {
+function NavBar({ isLoggedIn, setIsLoggedIn }) {
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if(token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    navigate("/");
+  };
+
   return (
     <nav className="navbar">
       <Link to="/">Home</Link>
-      <Link to="/register">Rejestracja</Link>
-      <button onClick={() => setShowLogin(true)}>Login</button>   {showLogin && <LoginPopup onClose={() => setShowLogin(false)} />}
       <Link to="/charactercreation">Character Creation</Link>
+
+      <div className="auth-buttons">
+        {isLoggedIn ? (
+          <button onClick={handleLogout}>Logout</button>
+        ) : (
+          <>
+            <button onClick={() => setShowLogin(true)}>Login</button>
+            <button onClick={() => setShowRegister(true)}>Register</button>
+          </>
+        )}
+      </div>
+
+      {showLogin && <LogInButton onClose={() => setShowLogin(false)} />}
+      {showRegister && <RegisterPopup onClose={() => setShowRegister(false)} />}
     </nav>
   );
 }

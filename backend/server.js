@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const sql = require("mssql");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 app.use(cors());
@@ -16,8 +17,8 @@ const dbConfig = {
   database: "ninja_db",
   port: 1433,
   options: {
-    encrypt: false, // Ustaw na true jeśli korzystasz z Azure SQL
-    trustServerCertificate: true, // Wymagane dla lokalnego MSSQL
+    encrypt: false,
+    trustServerCertificate: true,
   },
 };
 
@@ -32,95 +33,62 @@ const connectDB = async () => {
 
 connectDB();
 
-// **Register API**
+// **API do rejestracji**
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
-      return res.status(400).json({ message: "All fields are required!" });
+    return res.status(400).json({ message: "Wszystkie pola są wymagane!" });
   }
 
   try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await sql.query(
+      `INSERT INTO users (username, email, password) VALUES (@username, @email, @password)`,
+      {
+        username,
+        email,
+        password: hashedPassword,
+      }
+    );
 
-      const result = await sql.query(`
-          INSERT INTO users (username, email, password)
-          VALUES ('${username}', '${email}', '${hashedPassword}')
-      `);
-
-      res.status(201).json({ message: "✅ User registered successfully!" });
+    res.status(201).json({ message: "✅ Użytkownik zarejestrowany!" });
   } catch (error) {
-      console.error("❌ Error registering user:", error);
-      res.status(500).json({ message: "❌ Registration failed" });
+    console.error("❌ Błąd rejestracji:", error);
+    res.status(500).json({ message: "❌ Rejestracja nie powiodła się" });
   }
 });
 
-// **Login API**
+// **API do logowania**
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required!" });
+    return res.status(400).json({ message: "Email i hasło są wymagane!" });
   }
 
   try {
-      const user = await sql.query(`
-          SELECT * FROM users WHERE email = '${email}'
-      `);
+    const result = await sql.query(
+      `SELECT * FROM users WHERE email = @email`,
+      { email }
+    );
 
-      if (!user.recordset[0]) {
-          return res.status(401).json({ message: "❌ Invalid credentials" });
-      }
+    if (!result.recordset[0]) {
+      return res.status(401).json({ message: "❌ Nieprawidłowe dane logowania" });
+    }
 
-      const validPassword = await bcrypt.compare(password, user.recordset[0].password);
-      if (!validPassword) {
-          return res.status(401).json({ message: "❌ Invalid credentials" });
-      }
+    const user = result.recordset[0];
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ message: "❌ Nieprawidłowe dane logowania" });
+    }
 
-      // Generate JWT token
-      const token = jwt.sign({ id: user.recordset[0].id }, "secretkey", { expiresIn: "1h" });
+    const token = jwt.sign({ id: user.id }, "secretkey", { expiresIn: "1h" });
 
-      res.status(200).json({ message: "✅ Login successful!", token });
+    res.status(200).json({ message: "✅ Zalogowano!", token, user: { id: user.id, username: user.username } });
   } catch (error) {
-      console.error("❌ Error logging in:", error);
-      res.status(500).json({ message: "❌ Login failed" });
-  }
-});
-
-const authenticateToken = (req, res, next) => {
-  const token = req.header("Authorization");
-  if (!token) return res.status(401).json({ message: "Access Denied" });
-
-  try {
-      const verified = jwt.verify(token, "secretkey");
-      req.user = verified;
-      next();
-  } catch (error) {
-      res.status(400).json({ message: "Invalid Token" });
-  }
-};
-
-// Example of a protected route:
-app.get("/protected", authenticateToken, (req, res) => {
-  res.status(200).json({ message: "✅ Access granted!", user: req.user });
-});
-
-app.post("/save-character", async (req, res) => {
-  const { hp, chakra, name, clan, strength, agility, intelligence, chakraControl, ninJutsu, genJutsu, taiJutsu } = req.body;
-  if (!name || !clan) {
-    return res.status(400).json({ message: "⚠️ Wprowadź nazwę postaci i klan!" });
-  }
-
-  try {
-    const result = await sql.query(`
-      INSERT INTO characters (hp, chakra, name, clan, strength, agility, intelligence, chakraControl, ninJutsu, genJutsu, taiJutsu)
-      VALUES (${hp}, ${chakra},'${name}', '${clan}', ${strength}, ${agility}, ${intelligence}, ${chakraControl}, ${ninJutsu}, ${genJutsu}, ${taiJutsu})
-      `);
-
-    res.status(201).json({ message: "✅ Postać zapisana!" });
-  } catch (error) {
-    console.error("❌ Błąd podczas zapisywania postaci:", error);
-    res.status(500).json({ message: "❌ Błąd zapisu do bazy danych." });
+    console.error("❌ Błąd logowania:", error);
+    res.status(500).json({ message: "❌ Logowanie nie powiodło się" });
   }
 });
 
