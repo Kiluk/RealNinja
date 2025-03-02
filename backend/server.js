@@ -102,6 +102,56 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
+const authenticateToken = (req, res, next) => {
+  const token = req.header("Authorization");
+
+  if (!token) return res.status(401).json({ message: "Brak tokena, dostęp zabroniony!" });
+
+  try {
+    const verified = jwt.verify(token, "secretkey");
+    req.user = verified; // 🛠 Przechowujemy dane użytkownika w `req.user`
+    next();
+  } catch (error) {
+    res.status(403).json({ message: "Nieprawidłowy token!" });
+  }
+};
+
+app.post("/save-character", authenticateToken, async (req, res) => {
+  const { hp, chakra, name, clan, strength, agility, intelligence, chakraControl, ninJutsu, genJutsu, taiJutsu } = req.body;
+
+  if (!name || !clan) {
+    return res.status(400).json({ message: "⚠️ Wprowadź nazwę postaci i klan!" });
+  }
+
+  try {
+    const request = new sql.Request();
+    request.input("user_id", sql.Int, req.user.id); // 🔥 Pobieramy `user_id` z tokena
+    request.input("hp", sql.Int, hp);
+    request.input("chakra", sql.Int, chakra);
+    request.input("name", sql.VarChar, name);
+    request.input("clan", sql.VarChar, clan);
+    request.input("strength", sql.Int, strength);
+    request.input("agility", sql.Int, agility);
+    request.input("intelligence", sql.Int, intelligence);
+    request.input("chakraControl", sql.Int, chakraControl);
+    request.input("ninJutsu", sql.Int, ninJutsu);
+    request.input("genJutsu", sql.Int, genJutsu);
+    request.input("taiJutsu", sql.Int, taiJutsu);
+
+    const result = await request.query(`
+      INSERT INTO characters (user_id, hp, chakra, name, clan, strength, agility, intelligence, chakraControl, ninJutsu, genJutsu, taiJutsu)
+      VALUES (@user_id, @hp, @chakra, @name, @clan, @strength, @agility, @intelligence, @chakraControl, @ninJutsu, @genJutsu, @taiJutsu)
+    `);
+
+    res.status(201).json({ message: "✅ Postać zapisana!" });
+  } catch (error) {
+    console.error("❌ Błąd podczas zapisywania postaci:", error);
+    res.status(500).json({ message: "❌ Błąd zapisu do bazy danych." });
+  }
+});
+
+
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Serwer działa na porcie ${PORT}`);

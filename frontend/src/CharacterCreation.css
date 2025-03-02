@@ -57,6 +57,12 @@
     padding: 10px;
     border-radius: 10px;
   }
+
+  .stat-input {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+  }
   
   .stat button {
     background-color: #e74c3c;
