@@ -26,6 +26,8 @@ function NavBar({ isLoggedIn, setIsLoggedIn }) {
       <Link to="/">Home</Link>
       <Link to="/charactercreation">Character Creation</Link>
 
+      {isLoggedIn && <Link to="/characters">Your Characters</Link>}
+
       <div className="auth-buttons">
         {isLoggedIn ? (
           <button onClick={handleLogout}>Logout</button>

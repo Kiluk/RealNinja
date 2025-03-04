@@ -7,7 +7,6 @@ const router = express.Router();
 // Zapisywanie postaci
 router.post("/save-character", authenticateToken, async (req, res) => {
   const { hp, chakra, name, clan, strength, agility, intelligence, chakraControl, ninJutsu, genJutsu, taiJutsu } = req.body;
-
   if (!name || !clan) {
     return res.status(400).json({ message: "⚠️ Wprowadź nazwę postaci i klan!" });
   }
@@ -36,6 +35,44 @@ router.post("/save-character", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("❌ Błąd podczas zapisywania postaci:", error);
     res.status(500).json({ message: "❌ Błąd zapisu do bazy danych." });
+  }
+});
+
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const request = new sql.Request();
+    request.input("user_id", sql.Int, req.user.id);
+    const result = await request.query(`
+      SELECT id, name, clan, hp, chakra, strength, agility, intelligence, chakraControl, ninJutsu, genJutsu, taiJutsu 
+      FROM characters WHERE user_id = @user_id
+    `);
+
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("❌ Błąd pobierania postaci:", error);
+    res.status(500).json({ message: "❌ Błąd pobierania postaci." });
+  }
+});
+
+router.get("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const request = new sql.Request();
+    request.input("character_id", sql.Int, id);
+    request.input("user_id", sql.Int, req.user.id);
+
+    const result = await request.query(`
+      SELECT * FROM characters WHERE id = @character_id AND user_id = @user_id
+    `);
+
+    if (!result.recordset[0]) {
+      return res.status(404).json({ message: "⚠️ Postać nie została znaleziona." });
+    }
+
+    res.status(200).json(result.recordset[0]);
+  } catch (error) {
+    console.error("❌ Błąd pobierania postaci:", error);
+    res.status(500).json({ message: "❌ Błąd pobierania danych postaci." });
   }
 });
 

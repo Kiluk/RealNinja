@@ -48,7 +48,7 @@ const CharacterCreation = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:5000/save-character",
+        "http://localhost:5000/api/characters/save-character",
         {
           hp: stats.hp,
           chakra: stats.chakra,

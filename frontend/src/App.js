@@ -5,6 +5,8 @@ import Home from "./Home";
 import Register from "./Register";
 import CharacterCreation from "./CharacterCreation";
 import LogInButton from "./LogInButton";
+import CharacterList from "./CharacterList";
+import CharacterDetails from "./CharacterDetails";
 
 function App() {
 
@@ -19,6 +21,8 @@ function App() {
           <Route path="/login" element={<LogInButton />} />
           <Route path="/register" element={<Register />} />
           <Route path="/charactercreation" element={<CharacterCreation />} />
+          <Route path="/characters" element={<CharacterList />} />
+          <Route path="/character/:id" element={<CharacterDetails />} />
         </Routes>
       </div>
     </Router>
