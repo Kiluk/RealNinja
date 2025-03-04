@@ -12,7 +12,8 @@ function LogInButton({ onClose, setIsLoggedIn }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:5000/login", {
+      
+      const response = await axios.post("http://localhost:5000/api/users/login", {
         username,
         password,
       });
