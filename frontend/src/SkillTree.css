@@ -16,11 +16,18 @@
     background-color: #f5f5f5;
     border-radius: 5px;
     cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .skill.locked {
+    background-color: lightgray;
+    cursor: not-allowed;
   }
   
   .skill.unlocked {
     border-color: gold;
     background-color: yellow;
+    cursor: default;
   }
   
   .arrow {

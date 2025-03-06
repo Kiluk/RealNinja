@@ -121,4 +121,73 @@ router.get("/:id/skill-tree", authenticateToken, async (req, res) => {
   }
 });
 
+router.put("/:id/unlock-skill", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { skillId } = req.body;
+
+    if (!skillId) {
+      return res.status(400).json({ message: "⚠️ Nie podano ID umiejętności." });
+    }
+
+    // Sprawdzenie, czy postać istnieje
+    const charRequest = new sql.Request();
+    charRequest.input("character_id", sql.Int, id);
+    const charResult = await charRequest.query(`SELECT clan FROM characters WHERE id = @character_id`);
+
+    if (!charResult.recordset[0]) {
+      return res.status(404).json({ message: "⚠️ Postać nie została znaleziona." });
+    }
+
+    // Pobranie informacji o skillu
+    const skillRequest = new sql.Request();
+    skillRequest.input("skill_id", sql.Int, skillId);
+    const skillResult = await skillRequest.query(`SELECT prerequisite_id FROM skills WHERE id = @skill_id`);
+
+    if (!skillResult.recordset[0]) {
+      return res.status(404).json({ message: "⚠️ Umiejętność nie istnieje." });
+    }
+
+    const prerequisiteId = skillResult.recordset[0].prerequisite_id;
+
+    // Jeśli skill wymaga innej umiejętności, sprawdzamy, czy postać ją ma
+    if (prerequisiteId) {
+      const checkRequest = new sql.Request();
+      checkRequest.input("character_id", sql.Int, id);
+      checkRequest.input("prerequisite_id", sql.Int, prerequisiteId);
+
+      const checkResult = await checkRequest.query(`
+        SELECT * FROM character_skills 
+        WHERE character_id = @character_id AND skill_id = @prerequisite_id AND unlocked = 1
+      `);
+
+      if (!checkResult.recordset[0]) {
+        return res.status(400).json({ message: "⚠️ Najpierw musisz odblokować poprzednią umiejętność!" });
+      }
+    }
+
+    // Odblokowanie umiejętności
+    const unlockRequest = new sql.Request();
+    unlockRequest.input("character_id", sql.Int, id);
+    unlockRequest.input("skill_id", sql.Int, skillId);
+
+    await unlockRequest.query(`
+      IF EXISTS (SELECT 1 FROM character_skills WHERE character_id = @character_id AND skill_id = @skill_id)
+      BEGIN
+        UPDATE character_skills SET unlocked = 1 WHERE character_id = @character_id AND skill_id = @skill_id;
+      END
+      ELSE
+      BEGIN
+        INSERT INTO character_skills (character_id, skill_id, unlocked) VALUES (@character_id, @skill_id, 1);
+      END
+    `);
+
+    res.status(200).json({ message: "✅ Umiejętność odblokowana!" });
+  } catch (error) {
+    console.error("❌ Błąd odblokowywania umiejętności:", error);
+    res.status(500).json({ message: "❌ Błąd odblokowywania umiejętności." });
+  }
+});
+
+
 module.exports = router;
