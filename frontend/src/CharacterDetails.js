@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-const CharacterDetails = () => {
+import SkillTree from "./SkillTree";
+
+const CharacterDetails = ({}) => {
   const { id } = useParams();
   const [character, setCharacter] = useState(null);
+  const [showSkillTree, setShowSkillTree] = useState(false);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -38,6 +41,15 @@ const CharacterDetails = () => {
       <p>Ninjutsu: {character.ninJutsu}</p>
       <p>Genjutsu: {character.genJutsu}</p>
       <p>Taijutsu: {character.taiJutsu}</p>
+
+      <div>
+      <h2>{character.name} - {character.clan}</h2>
+      <button onClick={() => setShowSkillTree(!showSkillTree)}>
+        {showSkillTree ? "Ukryj Drzewko Umiejętności" : "Pokaż Drzewko Umiejętności"}
+      </button>
+
+      {showSkillTree && <SkillTree characterId={character.id} />}
+    </div>
     </div>
   );
 };

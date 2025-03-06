@@ -1,0 +1,31 @@
+.skill-tree {
+    text-align: center;
+  }
+  
+  .tree-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .skill {
+    padding: 10px 15px;
+    border: 2px solid gray;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .skill.unlocked {
+    border-color: gold;
+    background-color: yellow;
+  }
+  
+  .arrow {
+    margin-left: 5px;
+    font-weight: bold;
+    color: gray;
+  }
+  

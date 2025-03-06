@@ -76,4 +76,49 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/:id/skill-tree", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Pobieramy klan postaci
+    const charRequest = new sql.Request();
+    charRequest.input("id", sql.Int, id);
+    const charResult = await charRequest.query(`SELECT clan FROM characters WHERE id = @id`);
+
+    if (!charResult.recordset[0]) {
+      return res.status(404).json({ message: "⚠️ Postać nie została znaleziona." });
+    }
+
+    const clan = charResult.recordset[0].clan;
+
+    // Pobieramy wszystkie skille dla klanu postaci
+    const skillRequest = new sql.Request();
+    skillRequest.input("clan", sql.VarChar, clan);
+    const skillResult = await skillRequest.query(`
+      SELECT id, name, prerequisite_id FROM skills WHERE clan = @clan
+    `);
+
+    // Pobieramy odblokowane skille dla postaci
+    const unlockedRequest = new sql.Request();
+    unlockedRequest.input("character_id", sql.Int, id);
+    const unlockedResult = await unlockedRequest.query(`
+      SELECT skill_id FROM character_skills WHERE character_id = @character_id AND unlocked = 1
+    `);
+    const unlockedSkills = unlockedResult.recordset.map(row => row.skill_id);
+
+    // Tworzymy drzewko umiejętności
+    const skillTree = skillResult.recordset.map(skill => ({
+      id: skill.id,
+      name: skill.name,
+      prerequisite: skill.prerequisite_id,
+      unlocked: unlockedSkills.includes(skill.id),
+    }));
+
+    res.status(200).json(skillTree);
+  } catch (error) {
+    console.error("❌ Błąd pobierania drzewka umiejętności:", error);
+    res.status(500).json({ message: "❌ Błąd pobierania danych drzewka umiejętności." });
+  }
+});
+
 module.exports = router;
