@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./SkillTree.css";
+import "../assetes/styles/SkillTree.css";
 
 const SkillTree = ({ characterId }) => {
   const [skills, setSkills] = useState([]);

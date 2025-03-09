@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./CharacterCreation.css";
+import "../assetes/styles/CharacterCreation.css";
 import axios from "axios";
 
 const CharacterCreation = () => {
@@ -10,8 +10,8 @@ const CharacterCreation = () => {
   const [stats, setStats] = useState({
     hp: 20,
     chakra: 10,
-    strength: 5,
-    agility: 5,
+    vigor: 5,
+    speed: 5,
     intelligence: 5,
     chakraControl: 4,
     ninJutsu: 1,
@@ -54,8 +54,8 @@ const CharacterCreation = () => {
           chakra: stats.chakra,
           name: characterName,
           clan,
-          strength: stats.strength,
-          agility: stats.agility,
+          vigor: stats.vigor,
+          speed: stats.speed,
           chakraControl: stats.chakraControl,
           intelligence: stats.intelligence,
           ninJutsu: stats.ninJutsu,
@@ -139,7 +139,7 @@ const CharacterCreation = () => {
         </p>
         <p>
           {" "}
-          Siła {stats.strength}, Zręczność {stats.agility}, Inteligencja{" "}
+          Siła {stats.vigor}, Zręczność {stats.speed}, Inteligencja{" "}
           {stats.intelligence}, Kontrola Chakry {stats.chakraControl}
         </p>
         <p>

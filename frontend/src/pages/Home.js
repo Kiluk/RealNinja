@@ -1,6 +1,6 @@
 import React from "react";
-import "./App.css";
-import logo from "./shinobi.jpg";
+import "../assetes/styles/App.css";
+import logo from "../assetes/images/shinobi.jpg";
 
 const Home = () => {
   return (

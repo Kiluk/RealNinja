@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-
 import SkillTree from "./SkillTree";
 
 const CharacterDetails = ({}) => {
@@ -34,8 +33,8 @@ const CharacterDetails = ({}) => {
       <h2>{character.name} - {character.clan}</h2>
       <p>HP: {character.hp}</p>
       <p>Chakra: {character.chakra}</p>
-      <p>Siła: {character.strength}</p>
-      <p>Zręczność: {character.agility}</p>
+      <p>Siła: {character.vigor}</p>
+      <p>Zręczność: {character.speed}</p>
       <p>Inteligencja: {character.intelligence}</p>
       <p>Kontrola Chakry: {character.chakraControl}</p>
       <p>Ninjutsu: {character.ninJutsu}</p>

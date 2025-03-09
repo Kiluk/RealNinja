@@ -20,13 +20,13 @@
   }
   
   .skill.locked {
-    background-color: lightgray;
+    background-color: darkgray;
     cursor: not-allowed;
   }
   
   .skill.unlocked {
     border-color: gold;
-    background-color: yellow;
+    background-color: red;
     cursor: default;
   }
   

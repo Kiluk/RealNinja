@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Register.css";
+import "../assetes/styles/Register.css";
 
 const RegisterPopup = ({ onClose }) => {
   const [username, setUsername] = useState("");
