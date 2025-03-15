@@ -189,5 +189,34 @@ router.put("/:id/unlock-skill", authenticateToken, async (req, res) => {
   }
 });
 
+// Usuwanie postaci
+router.delete("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const request = new sql.Request();
+    request.input("character_id", sql.Int, id);
+    request.input("user_id", sql.Int, req.user.id);
+
+    // Sprawdzenie, czy postać należy do użytkownika
+    const checkResult = await request.query(`
+      SELECT id FROM characters WHERE id = @character_id AND user_id = @user_id
+    `);
+
+    if (!checkResult.recordset[0]) {
+      return res.status(404).json({ message: "⚠️ Postać nie została znaleziona lub nie należy do Ciebie." });
+    }
+
+    // Usunięcie postaci
+    await request.query(`
+      DELETE FROM characters WHERE id = @character_id AND user_id = @user_id
+    `);
+
+    res.status(200).json({ message: "✅ Postać została usunięta." });
+  } catch (error) {
+    console.error("❌ Błąd podczas usuwania postaci:", error);
+    res.status(500).json({ message: "❌ Błąd usuwania postaci." });
+  }
+});
+
 
 module.exports = router;

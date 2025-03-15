@@ -2,152 +2,141 @@ import React, { useState } from "react";
 import "../assetes/styles/CharacterCreation.css";
 import axios from "axios";
 
+const statDescriptions = {
+  vigor: "Zwiększa punkty życia i wpływa na siłę fizyczną.",
+  intelligence: "Zwiększa kontrolę chakry i skuteczność Genjutsu.",
+};
+
+const clans = {
+  Uchiha: { cost: 8, multipliers: { genJutsu: 3, ninJutsu: 2, chakraControl: 1 }, description: "Mistrzowie Genjutsu i Ninjutsu." },
+  Senju: { cost: 10, multipliers: { ninJutsu: 3, chakra: 2, hp: 1 }, description: "Silne ciało i ogromna kontrola chakry." },
+  Hyuga: { cost: 7, multipliers: { chakraControl: 3, speed: 2, taiJutsu: 1 }, description: "Specjaliści w Taijutsu i kontroli chakry." },
+  Nara: { cost: 5, multipliers: { intelligence: 3, genJutsu: 2, chakra: 1 }, description: "Inteligentni taktycy z umiejętnością manipulacji cieniem." },
+  Akimichi: { cost: 3, multipliers: { hp: 3, vigor: 2, taiJutsu: 1 }, description: "Potężne ciało i specjalizacja w Taijutsu." },
+};
+
+const getStatCost = (value) => {
+  return Math.floor(value / 2 + 1);
+};
+
 const CharacterCreation = () => {
+  const [step, setStep] = useState(1);
   const [characterName, setCharacterName] = useState("");
   const [clan, setClan] = useState("");
+  const [points, setPoints] = useState(30);
+  const [stats, setStats] = useState({ vigor: 0, intelligence: 0 });
+  const [finalStats, setFinalStats] = useState({});
   const [message, setMessage] = useState("");
 
-  const [stats, setStats] = useState({
-    hp: 20,
-    chakra: 10,
-    vigor: 5,
-    speed: 5,
-    intelligence: 5,
-    chakraControl: 4,
-    ninJutsu: 1,
-    genJutsu: 1,
-    taiJutsu: 1,
-  });
-
   const handleStatChange = (stat, amount) => {
-    setStats((prevStats) => ({
-      ...prevStats,
-      [stat]: Math.max(0, prevStats[stat] + amount), // Zapobiega wartościom ujemnym
-    }));
+    const cost = amount > 0 ? getStatCost(stats[stat]) : getStatCost(stats[stat]-1);
+    if (points - cost < 0 || stats[stat] + amount < 0) return;
+    setStats((prev) => ({ ...prev, [stat]: prev[stat] + amount }));
+    amount > 0 ? setPoints(points - cost) : setPoints(points + cost);
   };
 
-  const handleStatInput = (stat, value) => {
-    const numValue = parseInt(value, 10) || 0;
-    setStats((prevStats) => ({
-      ...prevStats,
-      [stat]: Math.max(0, numValue),
-    }));
+  const handleClanChange = (selectedClan) => {
+    if (points < clans[selectedClan].cost) return;
+    setClan(selectedClan);
+    setPoints(20 - clans[selectedClan].cost - stats.vigor - stats.intelligence);
+  };
+
+  const goToStep2 = () => {
+    if (!characterName || !clan || points !== 0) {
+      setMessage("⚠️ Wybierz nazwę, klan i rozdysponuj wszystkie punkty!");
+      return;
+    }
+    setStep(2);
+    setPoints(15);
+    setFinalStats({
+      hp: 1,
+      chakra: 1,
+      speed: 1,
+      chakraControl: 1,
+      ninJutsu: 1,
+      genJutsu: 1,
+      taiJutsu: 1,
+    });
+  };
+
+  const applyMultipliers = () => {
+    const multipliers = clans[clan].multipliers;
+    const { vigor, intelligence } = stats;
+    
+    return {
+      hp: finalStats.hp * (vigor  + (multipliers.hp || 0))* 5,
+      chakra: finalStats.chakra * (vigor  + intelligence * 10 + (multipliers.chakra || 0))* 5,
+      speed: finalStats.speed *( vigor + (multipliers.speed || 0)),
+      chakraControl: finalStats.chakraControl * (intelligence + (multipliers.chakraControl || 0)),
+      ninJutsu: finalStats.ninJutsu * Math.floor((vigor + intelligence) / 2) + (multipliers.ninJutsu || 0),
+      genJutsu: finalStats.genJutsu * (intelligence + (multipliers.genJutsu || 0)),
+      taiJutsu: finalStats.taiJutsu * (vigor + (multipliers.taiJutsu || 0)),
+    };
+  };
+
+  const handleFinalStatChange = (stat, amount) => {
+    if (points - amount < 0 || finalStats[stat] + amount < 0) return;
+    setFinalStats((prev) => ({ ...prev, [stat]: prev[stat] + amount }));
+    setPoints(points - amount);
   };
 
   const saveCharacter = async () => {
-    if (!characterName || !clan) {
-      setMessage("⚠️ Wprowadź nazwę postaci i wybierz klan!");
-      return;
-    }
-
+    const newStats = applyMultipliers();
     try {
-      const token = localStorage.getItem("token"); // Pobranie tokena JWT
+      const token = localStorage.getItem("token");
       if (!token) {
         setMessage("Musisz być zalogowany, aby stworzyć postać!");
         return;
       }
 
-      const response = await axios.post(
-        "http://localhost:5000/api/characters/save-character",
-        {
-          hp: stats.hp,
-          chakra: stats.chakra,
-          name: characterName,
-          clan,
-          vigor: stats.vigor,
-          speed: stats.speed,
-          chakraControl: stats.chakraControl,
-          intelligence: stats.intelligence,
-          ninJutsu: stats.ninJutsu,
-          genJutsu: stats.genJutsu,
-          taiJutsu: stats.taiJutsu,
-        },
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
-      );
-
+      await axios.post("http://localhost:5000/api/characters/save-character", {
+        name: characterName,
+        clan,
+        ...newStats,
+      }, {
+        headers: { Authorization: token },
+      });
       setMessage("✅ Postać została zapisana!");
-      console.log(response.data);
     } catch (error) {
       setMessage("❌ Błąd podczas zapisywania postaci.");
-      console.error("Error saving character:", error);
     }
   };
 
   return (
-    <>
-      <div className="character-creation">
-        <h1>Kreacja Postaci</h1>
-
-        <div className="input-group">
-          <label>Nazwa postaci:</label>
-          <input
-            type="text"
-            value={characterName}
-            onChange={(e) => setCharacterName(e.target.value)}
-            placeholder="Wpisz nazwę"
-          />
-        </div>
-
-        <div className="input-group">
-          <label>Wybierz klan:</label>
-          <select value={clan} onChange={(e) => setClan(e.target.value)}>
+    <div className="character-creation">
+      {step === 1 ? (
+        <>
+          <h1>Krok 1: Wybierz podstawowe atrybuty</h1>
+          <input type="text" placeholder="Nazwa postaci" value={characterName} onChange={(e) => setCharacterName(e.target.value)} />
+          <select value={clan} onChange={(e) => handleClanChange(e.target.value)}>
             <option value="">-- Wybierz klan --</option>
-            <option value="Uchiha">Uchiha</option>
-            <option value="Senju">Senju</option>
-            <option value="Hyuga">Hyuga</option>
-            <option value="Nara">Nara</option>
-            <option value="Akimichi">Akimichi</option>
+            {Object.keys(clans).map((c) => (
+              <option key={c} value={c}>{c} (Koszt: {clans[c].cost})</option>
+            ))}
           </select>
-        </div>
-
-        <div className="stats-container">
+          <p>{clan && clans[clan].description}</p>
           {Object.keys(stats).map((stat) => (
-            <div key={stat} className="stat">
-              <span>{stat.toUpperCase()}</span>
-              <button onClick={() => handleStatChange(stat, -1)}>-</button>
-              <input
-                type="number"
-                value={stats[stat]}
-                onChange={(e) => handleStatInput(stat, e.target.value)}
-                min="0"
-                className="stat-input"
-              />
+            <div key={stat} title={statDescriptions[stat]}>
+              {stat.toUpperCase()}: {stats[stat]} 
               <button onClick={() => handleStatChange(stat, 1)}>+</button>
+              <button onClick={() => handleStatChange(stat, -1)}>-</button>
             </div>
           ))}
-        </div>
-
-        <button onClick={saveCharacter} className="save-btn">
-          Zapisz Postać
-        </button>
-        {message && <p className="message">{message}</p>}
-      </div>
-      <div className="summary">
-        <h2>Podsumowanie</h2>
-        <p>
-          <strong>Nazwa:</strong> {characterName || "Brak"}
-        </p>
-        <p>
-          <strong>Klan:</strong> {clan || "Nie wybrano"}
-        </p>
-        <p>
-          <strong>Statystyki:</strong> HP {stats.hp}, Chakra {stats.chakra}
-        </p>
-        <p>
-          {" "}
-          Siła {stats.vigor}, Zręczność {stats.speed}, Inteligencja{" "}
-          {stats.intelligence}, Kontrola Chakry {stats.chakraControl}
-        </p>
-        <p>
-          Genjutsu {stats.genJutsu}. Taijutsu {stats.taiJutsu}, Ninjutsu{" "}
-          {stats.ninJutsu}
-        </p>
-      </div>
-    </>
+          <p>Pozostałe punkty: {points}</p>
+          <button onClick={goToStep2}>Dalej</button>
+        </>
+      ) : (
+        <>
+          <h1>Krok 2: Rozdziel statystyki</h1>
+          {Object.keys(finalStats).map((stat) => (
+            <div key={stat}>{stat.toUpperCase()}: {finalStats[stat]} <button onClick={() => handleFinalStatChange(stat, 1)}>+</button><button onClick={() => handleFinalStatChange(stat, -1)}>-</button></div>
+          ))}
+          <p>Pozostałe punkty: {points}</p>
+          <button onClick={saveCharacter}>Zapisz Postać</button>
+        </>
+      )}
+      {message && <p className="message">{message}</p>}
+    </div>
   );
 };
 
