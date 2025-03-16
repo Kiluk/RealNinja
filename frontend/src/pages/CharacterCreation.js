@@ -64,6 +64,8 @@ const CharacterCreation = () => {
     const { vigor, intelligence } = stats;
     
     return {
+      vigor: stats.vigor,
+      intelligence: stats.intelligence,
       hp: finalStats.hp * (vigor  + (multipliers.hp || 0))* 5,
       chakra: finalStats.chakra * (vigor  + intelligence * 10 + (multipliers.chakra || 0))* 5,
       speed: finalStats.speed *( vigor + (multipliers.speed || 0)),

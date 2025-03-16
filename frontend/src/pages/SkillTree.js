@@ -10,10 +10,31 @@ const SkillTree = ({ characterId }) => {
     const fetchSkillTree = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:5000/api/characters/${characterId}/skill-tree`, {
-          headers: { Authorization: token },
+        const response = await axios.get(
+          `http://localhost:5000/api/characters/${characterId}/skill-tree`,
+          {
+            headers: { Authorization: token },
+          }
+        );
+
+        // Tworzymy strukturę drzewa
+        const skillMap = {};
+        response.data.forEach(
+          (skill) => (skillMap[skill.id] = { ...skill, children: [] })
+        );
+
+        const rootSkills = [];
+        response.data.forEach((skill) => {
+          if (skill.prerequisite) {
+            if (skillMap[skill.prerequisite]) {
+              skillMap[skill.prerequisite].children.push(skillMap[skill.id]);
+            }
+          } else {
+            rootSkills.push(skillMap[skill.id]);
+          }
         });
-        setSkills(response.data);
+
+        setSkills(rootSkills);
       } catch (error) {
         console.error("❌ Błąd pobierania drzewka umiejętności:", error);
       }
@@ -22,35 +43,24 @@ const SkillTree = ({ characterId }) => {
     fetchSkillTree();
   }, [characterId]);
 
-  useEffect(() => {
-    const fetchSkillTree = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:5000/api/characters/${characterId}/skill-tree`, {
-          headers: { Authorization: token },
-        });
-        setSkills(response.data);
-      } catch (error) {
-        console.error("❌ Błąd pobierania drzewka umiejętności:", error);
-      }
-    };
+  const unlockSkill = async (skill) => {
+    if (!skill.canUnlock) {
+      setMessage(`⚠️ Nie spełniasz wymagań do odblokowania ${skill.name}.`);
+      return;
+    }
 
-    fetchSkillTree();
-  }, [characterId]);
-
-  const unlockSkill = async (skillId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:5000/api/characters/${characterId}/unlock-skill`,
-        { skillId },
+        { skillId: skill.id },
         { headers: { Authorization: token } }
       );
 
-      setMessage(response.data.message);
+      setMessage(`✅ ${skill.name} został odblokowany!`);
       setSkills((prevSkills) =>
-        prevSkills.map((skill) =>
-          skill.id === skillId ? { ...skill, unlocked: true } : skill
+        prevSkills.map((s) =>
+          s.id === skill.id ? { ...s, unlocked: true } : s
         )
       );
     } catch (error) {
@@ -58,22 +68,59 @@ const SkillTree = ({ characterId }) => {
     }
   };
 
+  const renderSkillTree = (skills) => {
+    return (
+      <div className="skill-row">
+        {skills.map((skill) => {
+          let skillClass = "skill-card";
+          if (skill.unlocked) {
+            skillClass += " unlocked"; // Zielony
+          } else if (skill.canUnlock) {
+            skillClass += " can-unlock"; // Niebieski
+          } else {
+            skillClass += " locked"; // Szary
+          }
+
+          return (
+            <div key={skill.id} className="skill-container">
+              {/* Główna karta umiejętności */}
+              <div className={skillClass}>
+                <div
+                  className="skill-content"
+                  onClick={() => !skill.unlocked && unlockSkill(skill)}
+                >
+                  <h3>{skill.name}</h3>
+                  <p>{skill.description}</p>
+                  <p className="skill-requirements">
+                    Wymagania: Nin {skill.requiredNinjutsu} | Tai{" "}
+                    {skill.requiredTaijutsu} | Gen {skill.requiredGenjutsu}
+                  </p>
+                </div>
+              </div>
+
+              {/* Połączenie do dzieci */}
+              {skill.children.length > 0 && (
+                <div className="skill-children">
+                  {/* Wycentrowana linia */}
+                  <div className="skill-connection"></div>
+                  {/* Renderowanie dzieci */}
+                  <div className="skill-subtree">
+                    {renderSkillTree(skill.children)}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="skill-tree">
       <h2>Drzewko Umiejętności</h2>
       {message && <p>{message}</p>}
-      <div className="tree-container">
-        {skills.map((skill) => (
-          <div
-            key={skill.id}
-            className={`skill ${skill.unlocked ? "unlocked" : "locked"}`}
-            onClick={() => !skill.unlocked && unlockSkill(skill.id)}
-          >
-            {skill.name}
-            {skill.prerequisite && <span className="arrow">→</span>}
-          </div>
-        ))}
-      </div>
+      <div className="tree-container">{renderSkillTree(skills)}</div>
     </div>
   );
 };

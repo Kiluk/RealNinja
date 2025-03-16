@@ -12,7 +12,7 @@ const CharacterDetails = ({}) => {
     const fetchCharacter = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:5000/api/characters/${id}`, {
+        const response = await axios.get(`http://localhost:5000/api/characters/${id}/stats`, {
           headers: { Authorization: token },
         });
         setCharacter(response.data);
