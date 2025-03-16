@@ -31,7 +31,6 @@ router.post("/save-character", authenticateToken, async (req, res) => {
     }
 
     const request = new sql.Request();
-    console.log(req.body);
     request.input("user_id", sql.Int, req.user.id);
     request.input("name", sql.VarChar, name);
     request.input("clan", sql.VarChar, clan);
