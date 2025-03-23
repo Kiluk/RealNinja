@@ -7,6 +7,7 @@ import CharacterCreation from "./pages/CharacterCreation";
 import LogInButton from "./components/LogInButton";
 import CharacterList from "./pages/CharacterList";
 import CharacterDetails from "./pages/CharacterDetails";
+import BoardPage from "./pages/BoardPage"; // 🆕 import u góry
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/login" element={<LogInButton />} />
           <Route path="/register" element={<RegisterPopup />} />
           <Route path="/charactercreation" element={<CharacterCreation />} />
+          <Route path="/board" element={<BoardPage />} />
           <Route path="/characters" element={<CharacterList />} />
           <Route path="/character/:id" element={<CharacterDetails />} />
         </Routes>

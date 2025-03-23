@@ -42,8 +42,8 @@ const CharacterCreation = () => {
   };
 
   const goToStep2 = () => {
-    if (!characterName || !clan || points !== 0) {
-      setMessage("⚠️ Wybierz nazwę, klan i rozdysponuj wszystkie punkty!");
+    if (!characterName || !clan ) {
+      setMessage("⚠️ Wybierz nazwę i klan!");
       return;
     }
     setStep(2);

@@ -65,7 +65,6 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     request.input("id", sql.Int, id);
     request.input("user_id", sql.Int, req.user.id);
 
-    // Sprawdzenie, czy postać należy do użytkownika
     const checkResult = await request.query(`
       SELECT id FROM characters WHERE id = @id AND user_id = @user_id
     `);
@@ -74,7 +73,6 @@ router.delete("/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "⚠️ Postać nie została znaleziona lub nie należy do Ciebie." });
     }
 
-    // Usunięcie postaci
     await request.query(`DELETE FROM characters WHERE id = @id AND user_id = @user_id`);
 
     res.status(200).json({ message: "✅ Postać została usunięta." });

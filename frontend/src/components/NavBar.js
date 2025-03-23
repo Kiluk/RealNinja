@@ -10,7 +10,7 @@ function NavBar({ isLoggedIn, setIsLoggedIn }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if(token) {
+    if (token) {
       setIsLoggedIn(true);
     }
   }, []);
@@ -26,7 +26,12 @@ function NavBar({ isLoggedIn, setIsLoggedIn }) {
       <Link to="/">Home</Link>
       <Link to="/charactercreation">Character Creation</Link>
 
-      {isLoggedIn && <Link to="/characters">Your Characters</Link>}
+      {isLoggedIn && (
+        <>
+          <Link to="/characters">Your Characters</Link>
+          <Link to="/board">Game Board</Link> {/* 🆕 */}
+        </>
+      )}
 
       <div className="auth-buttons">
         {isLoggedIn ? (
@@ -39,7 +44,12 @@ function NavBar({ isLoggedIn, setIsLoggedIn }) {
         )}
       </div>
 
-      {showLogin && <LogInButton onClose={() => setShowLogin(false)} setIsLoggedIn={setIsLoggedIn} />}
+      {showLogin && (
+        <LogInButton
+          onClose={() => setShowLogin(false)}
+          setIsLoggedIn={setIsLoggedIn}
+        />
+      )}
       {showRegister && <RegisterPopup onClose={() => setShowRegister(false)} />}
     </nav>
   );
